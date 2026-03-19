@@ -116,27 +116,27 @@
   .fc.b2{border-color:var(--red-d)!important;color:var(--red)!important}
 
   /* NEWS CARDS — minimalista v13 */
-  .nc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
+  .nc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:12px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
   .nc:hover{border-color:var(--border2);background:#161616}
-  .nc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px}
+  .nc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
   .nc.bull::before,.nc.cri::before{background:var(--green)}.nc.bear::before{background:var(--red)}
   .nc.edu::before,.nc.trd::before,.nc.def::before{background:var(--blue)}.nc.br::before{background:var(--accent)}
   .nc.macro::before{background:#9B7FE8}.nc.geo::before{background:#60C8C8}
   .nc-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-  .nc-title{font-family:var(--display);font-size:13.5px;font-weight:700;line-height:1.45;margin-bottom:10px;letter-spacing:-.01em;padding-right:52px}
-  .nc-exc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+  .nc-title{font-family:var(--display);font-size:15.5px;font-weight:700;line-height:1.45;margin-bottom:10px;letter-spacing:-.01em;padding-right:52px}
+  .nc-exc{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:14px}
   .src-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--muted2);text-decoration:none;letter-spacing:.03em;transition:color .1s}
   .src-tag:hover{color:var(--text)}
   .nc-age{font-family:var(--mono);font-size:9px;color:var(--muted2)}
   .bdgs{display:flex;gap:3px;margin-bottom:8px;flex-wrap:wrap}
-  .bdg{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px}
+  .bdg{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px}
   .bdg.hot,.bdg.mega{background:var(--red-d);color:var(--red)}
   .bdg.bull{background:var(--green-d);color:var(--green)}.bdg.bear{background:var(--red-d);color:var(--red)}
   .bdg.edu,.bdg.edu2{background:var(--blue-d);color:var(--blue)}.bdg.br{background:var(--accent-d);color:var(--accent)}
   .bdg.macro,.bdg.def{background:rgba(155,127,232,.1);color:#9B7FE8}.bdg.geo{background:rgba(96,200,200,.1);color:#60C8C8}
   .bdg.cri{background:var(--accent-d);color:var(--accent)}.bdg.trd{background:var(--blue-d);color:var(--blue)}
   /* SCORE BADGE */
-  .score-b{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px}
+  .score-b{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:12px;font-weight:700;padding:4px 9px;border-radius:4px}
   .score-b.g{background:var(--green-d);color:var(--green)}.score-b.y{background:var(--accent-d);color:var(--accent)}.score-b.r{background:var(--red-d);color:var(--red)}
   /* ANALYST BLOCK */
   .a-block{background:var(--surface2);border-radius:3px;padding:8px 10px;margin-bottom:10px;border-left:2px solid var(--border2)}
@@ -147,10 +147,10 @@
   .a-sent.positivo{background:var(--green-d);color:var(--green)}
   .a-sent.negativo{background:var(--red-d);color:var(--red)}
   .a-sent.neutro{background:var(--border);color:var(--muted)}
-  .a-note{font-size:11px;color:var(--muted);line-height:1.55}
+  .a-note{font-size:12px;color:var(--muted);line-height:1.65}
   /* ACTIONS */
   .nc-acts{display:flex;gap:4px;padding-top:8px;border-top:1px solid var(--border)}
-  .na{background:transparent;border:1px solid var(--border2);color:var(--muted2);padding:3px 8px;border-radius:3px;font-family:var(--mono);font-size:9px;cursor:pointer;transition:all .12s;letter-spacing:.02em}
+  .na{background:transparent;border:1px solid var(--border2);color:var(--muted2);padding:5px 12px;border-radius:4px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .12s;letter-spacing:.02em}
   .na:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-d)}
   .na.p{border-color:var(--border2)}.na.c{}.na.r{}
 
@@ -173,7 +173,7 @@
 
   /* SKEL */
   .skel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:7px}
-  .sk-c{height:110px}
+  .sk-c{height:160px}
 
   /* AUTORAL */
   .aut-hero{text-align:center;padding:28px 0 20px}
@@ -388,7 +388,7 @@
   <div class="mc"><div class="mc-l">Carrosséis</div><div class="mc-v o" id="m6">13</div><div class="mc-s">autorais prontos</div></div>
 </div>
 
-<div class="src-db" id="srcDb" style="display:none">
+<div class="src-db" id="srcDb" style="display:none!important">
   <div class="src-db-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <span>Base de Dados — <em id="srcCount">100 fontes</em></span>
     <span id="srcModeLabel" style="font-size:9px;padding:2px 7px;border-radius:3px;background:var(--surface2);color:var(--muted2);font-family:var(--mono)">Modo estático — dados curados manualmente</span>
@@ -2356,7 +2356,7 @@ function finalize(btn){
   window._scanning=false;
   btn.classList.remove('run');btn.querySelector('.btxt').textContent='Varrer o Mercado Agora';
   document.getElementById('progW').classList.remove('on');
-  renderFeed();renderMetrics();renderAutoral();renderIG();renderPrices();renderCalendar();renderSourceDB();
+  renderFeed();renderMetrics();renderAutoral();renderIG();renderPrices();renderCalendar();
   const _n=new Date();const t=document.getElementById('hTime');if(t)t.textContent=_n.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})+' · '+_n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   toast('🔥 '+NEWS.length+' notícias · '+AUTORAIS.length+' autorais · '+SOURCES.length+' fontes · '+IG_PROFILES.length+' instagrams');
 }
@@ -2791,7 +2791,7 @@ function renderCalendar(){
   `).join('');
 }
 
-function renderSourceDB(){
+function {
   const db=document.getElementById('srcDb');
   db.style.display='block';
   const all=SOURCES;
@@ -3026,7 +3026,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   try{renderAutoral();}catch(e){console.warn('renderAutoral',e);}
   try{renderIG();}catch(e){}
   try{renderCalendar();}catch(e){}
-  try{renderSourceDB();}catch(e){}
   // Preços ao vivo imediatamente
   fetchLivePrices();
   // Scan animação começa depois (conteúdo já está visível)
