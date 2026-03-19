@@ -9,7 +9,7 @@
 <meta property="og:description" content="100 fontes · 24 notícias · 13 carrosséis prontos para publicar">
 <meta name="theme-color" content="#0C0C0C">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
     --bg:#0C0C0C;--surface:#141414;--surface2:#1A1A1A;
@@ -19,7 +19,7 @@
     --red:#E05050;--red-d:rgba(224,80,80,.10);
     --green:#40C878;--green-d:rgba(64,200,120,.10);
     --blue:#60AAFF;--blue-d:rgba(96,170,255,.10);
-    --radius:5px;--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+    --radius:6px;--font:'Plus Jakarta Sans','Inter',system-ui,sans-serif;--display:'Plus Jakarta Sans','Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
   }
   html{font-size:14px}
   body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;min-height:100vh}
@@ -55,7 +55,7 @@
   /* HERO */
   .hero{padding:48px 0 32px;text-align:center}
   .hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
-  .hero-h{font-size:34px;font-weight:700;letter-spacing:-.04em;line-height:1.1;color:var(--text);margin-bottom:10px}
+  .hero-h{font-family:var(--display);font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1.1;color:var(--text);margin-bottom:10px}
   .hero-h span{color:var(--accent)}
   .hero-sub{font-size:13px;color:var(--muted);max-width:500px;margin:0 auto 20px;line-height:1.7}
   .scan-btn{background:var(--accent);color:#000;border:none;padding:10px 22px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;display:inline-flex;align-items:center;gap:8px}
@@ -123,7 +123,7 @@
   .nc.edu::before,.nc.trd::before,.nc.def::before{background:var(--blue)}.nc.br::before{background:var(--accent)}
   .nc.macro::before{background:#9B7FE8}.nc.geo::before{background:#60C8C8}
   .nc-meta{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-  .nc-title{font-size:13px;font-weight:600;line-height:1.45;margin-bottom:10px;letter-spacing:-.01em;padding-right:52px}
+  .nc-title{font-family:var(--display);font-size:13.5px;font-weight:700;line-height:1.45;margin-bottom:10px;letter-spacing:-.01em;padding-right:52px}
   .nc-exc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px}
   .src-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--muted2);text-decoration:none;letter-spacing:.03em;transition:color .1s}
   .src-tag:hover{color:var(--text)}
@@ -345,11 +345,11 @@
     <div class="logo-divider"></div>
     <div class="logo-meta">
       <span class="logo-name">Base de Dados Cripto Brasil</span>
-      <span class="logo-sub">Base de Dados Cripto Brasil · v11</span>
+      <span class="logo-sub">Base de Dados Cripto Brasil · v14</span>
     </div>
   </div>
   <div class="hdr-r">
-    <span id="backendBadge" class="hpill" style="color:var(--muted2);border:1px solid var(--border2)">Estático</span>
+    <span id="backendBadge" class="hpill" style="display:none"></span>
     <div class="hpill live"><div class="dot"></div>Ao Vivo</div>
     <div class="hpill fear">Medo Extremo</div>
     <div class="hpill dt" id="hTime"></div>
@@ -361,10 +361,6 @@
   <div class="hero-eyebrow"><span id="heroBadgeDate">13 Mar 2026</span> · 95 fontes · Filtro analista</div>
   <h1 class="hero-h">Base de Dados<br><span>Cripto Brasil</span></h1>
   <p class="hero-sub">95 fontes monitoradas. Filtro analista com classificação ★★★, sentimento e nota de impacto. Carrosséis e roteiros prontos. Só notícias que importam, das últimas 72h.</p>
-  <div class="backend-row">
-    <span id="backendBadgeHero" style="font-family:var(--mono);font-size:10px;color:var(--muted2)">Modo Estático</span>
-    <button class="backend-btn" onclick="showBackendConfig()">Configurar Backend</button>
-  </div>
   <button class="scan-btn" id="mainBtn" onclick="startScan()">
     <span class="bi" id="biIcon">⟳</span><span class="btxt">Varrer o Mercado Agora</span>
   </button>
@@ -2352,17 +2348,7 @@ async function startScan(){
   })();
 }
 
-function setBackendBadge(ok){
-  const badge = document.getElementById('backendBadge');
-  if(!badge) return;
-  if(ok){
-    badge.textContent = 'Backend Ativo';
-    badge.style.color = 'var(--accent)';
-  } else {
-    badge.textContent = '⚪ Modo Estático';
-    badge.style.color = 'var(--muted)';
-  }
-}
+function setBackendBadge(ok){ /* backend always active */ }
 
 function clearFeed(){document.getElementById('feed').innerHTML='<div class="skel sk-c"></div><div class="skel sk-c"></div><div class="skel sk-c"></div>';}
 
@@ -2848,6 +2834,20 @@ function openM(id,tab='post'){
   document.getElementById('dBox').textContent=n.dalle;
   document.getElementById('dVars').innerHTML=n.dalleVars.map((v,i)=>`<div class="ob" style="margin-bottom:8px"><div class="ob-l">Variação ${i+1}</div><div style="font-family:var(--mono);font-size:10px;line-height:1.7;color:var(--text);padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:4px">${v}</div></div>`).join('');
   stab(tab);openModal();
+
+  // Auto-gera carrossel/reel com Claude se conteúdo for fraco
+  if (_slidesAreWeak(n.slides) || _reelIsWeak(n.reel)) {
+    showModalGenLoading();
+    enrichArticleWithClaude(n).then(enriched => {
+      buildSlides(enriched.slides);
+      const rs = document.getElementById('rScript');
+      if (rs && enriched.reel?.script) {
+        rs.innerHTML = '<div class="reel-prose">' + enriched.reel.script.replace(/\n/g,'<br>') + '</div>';
+      }
+      const rStats = document.getElementById('rStats');
+      if(rStats) rStats.innerHTML = '<div class="rsc"><div class="rsc-l">Duração</div><div class="rsc-v g">' + (enriched.reel.dur||'30s') + '</div></div><div class="rsc"><div class="rsc-l">Trilha</div><div class="rsc-v y">' + (enriched.reel.music||'') + '</div></div><div class="rsc"><div class="rsc-l">Legenda</div><div class="rsc-v" style="font-size:11px;line-height:1.5">' + (enriched.reel.cap||n.cap||'') + '</div></div>';
+    });
+  }
 }
 
 // MODAL AUTORAL
@@ -3099,7 +3099,7 @@ async function loadPublisherQueue(){
 
   // Load queue
   try{
-    const r = await fetch(BACKEND_URL+'/api/queue',{signal:AbortSignal.timeout(5000)});
+    const r = await fetch(BACKEND_URL+'/api/queue',{signal:AbortSignal.timeout(12000)});
     const data = await r.json();
 
     // Update stats
@@ -3254,24 +3254,99 @@ function hashStr(str){
 }
 
 
-function showBackendConfig(){
-  const cur=localStorage.getItem('cripto_backend_url')||'';
-  const url=prompt('URL do Backend (deixe vazio para modo estático):', cur);
-  if(url===null)return;
-  if(url.trim()){
-    localStorage.setItem('cripto_backend_url',url.trim());
-    BACKEND_URL=url.trim();
-    ['backendBadge','backendBadgeHero'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el)el.textContent='Backend: '+url.trim().replace('https://','').split('/')[0];
+// Backend is hardcoded — no manual config needed
+
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLAUDE API — GERAÇÃO AUTOMÁTICA DE CARROSSEL + REEL
+// Ativado quando o conteúdo do backend está vazio/insuficiente
+// ══════════════════════════════════════════════════════════════════════════
+const _contentCache = {};
+
+function _slidesAreWeak(slides) {
+  if (!slides || slides.length < 4) return true;
+  const total = slides.reduce((a, s) => a + (s.t || '').split(/\s+/).filter(Boolean).length, 0);
+  return total < 80;
+}
+function _reelIsWeak(reel) {
+  const s = reel?.script || '';
+  return !s || s.length < 100 || s === 'Script completo disponível.' || s.includes('Script disponível');
+}
+
+const _EDITORIAL_SYS = `Você é um criador de conteúdo cripto para o mercado brasileiro. Gere conteúdo seguindo EXATAMENTE estas regras:
+
+CARROSSEL (7-8 slides):
+- SLIDE 1 CAPA: contradição impossível. NUNCA "Bitcoin caiu X%". Deve fazer o leitor pensar "isso não pode estar certo"
+- SLIDES 2-3: número da mídia vs número real. Período exato: "Março de 2020: −50% → +1.200% em 13 meses"
+- SLIDES 4-6: dados on-chain + AVISO HONESTO obrigatório em slide dedicado
+- SLIDES 7-8: mecanismo estrutural, o que mudou nesse ciclo
+- SLIDE FINAL: "Salva esse carrossel. Não pela análise. Pelo registro de como você estava se sentindo agora."
+
+REEL (20-35 segundos):
+- ABERTURA (5s): 1 frase que prende com dado/contradição
+- DESENVOLVIMENTO (20s): 3 dados concretos com período exato (ex: "Novembro de 2022: Bitcoin a $15k. Hoje: +300%")
+- AVISO HONESTO (5s): "Agora o aviso que eu preciso te dar: isso não significa que..."
+- FECHAMENTO (5s): "Salva esse vídeo. Não pela previsão. Pelo lembrete."
+
+PROIBIDO: "vai subir", "moon", "compra agora", excerpt bruto, dados sem período.
+OBRIGATÓRIO: "historicamente", período exato (mês/ano), valores em R$ para BR.
+
+Retorne APENAS JSON válido, sem markdown:
+{"slides":[{"role":"capa","t":"texto"},{"role":"corpo","t":"texto","img":"sugestão"},{"role":"aviso","t":"⚠️ O AVISO HONESTO\\n\\ntexto"},{"role":"mecanismo","t":"texto"},{"role":"final","t":"texto @criptobrasilofc"}],"reel":{"script":"roteiro completo 100-150 palavras","dur":"30s","music":"descrição da música"}}`;
+
+async function generateContentWithClaude(article) {
+  const key = article.id || article.title;
+  if (_contentCache[key]) return _contentCache[key];
+  const prompt = `Notícia: ${article.title}
+Fonte: ${article.srcN || 'desconhecida'}
+Contexto: ${article.exc || article.pP || ''}
+Classificação: ${article.cls || 'cripto'}
+Formato detectado: ${article.editorial_format || 'EDUCATIVO_CONTEXTO'}
+
+Gere carrossel e reel para essa notícia.`;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: _EDITORIAL_SYS,
+        messages: [{role: 'user', content: prompt}]
+      })
     });
-    toast('Backend configurado');
-    checkBackend();
-  } else {
-    localStorage.removeItem('cripto_backend_url');
-    BACKEND_URL=DEFAULT_BACKEND;
-    toast('Modo estático ativado');
+    const data = await r.json();
+    const raw = data?.content?.[0]?.text || '';
+    const clean = raw.replace(/^```json\s*/,'').replace(/```\s*$/,'').trim();
+    const parsed = JSON.parse(clean);
+    _contentCache[key] = parsed;
+    return parsed;
+  } catch(e) {
+    console.warn('[Claude Gen]', e);
+    return null;
   }
+}
+
+async function enrichArticleWithClaude(article) {
+  if (!_slidesAreWeak(article.slides) && !_reelIsWeak(article.reel)) return article;
+  const gen = await generateContentWithClaude(article);
+  if (!gen) return article;
+  if (_slidesAreWeak(article.slides) && gen.slides?.length >= 4) {
+    article.slides = gen.slides.map(s => ({role: s.role||'corpo', t: s.t||'', img: s.img||''}));
+  }
+  if (_reelIsWeak(article.reel) && gen.reel?.script) {
+    article.reel = {...article.reel, script: gen.reel.script, dur: gen.reel.dur||'30s', music: gen.reel.music||article.reel?.music||''};
+  }
+  return article;
+}
+
+function showModalGenLoading() {
+  const sDet = document.getElementById('sDet');
+  const rs = document.getElementById('rScript');
+  const h = `<div style="padding:40px;text-align:center;color:var(--muted)"><div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px"></div><div style="font-size:11px;font-family:var(--mono)">Gerando com Claude...</div></div>`;
+  if(sDet) sDet.innerHTML = h;
+  if(rs) rs.innerHTML = h;
 }
 
 </script>
