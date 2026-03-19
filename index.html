@@ -2168,7 +2168,7 @@ let usingBackend = false;
 
 async function checkBackend(){
   try{
-    const r = await fetch(BACKEND_URL+'/api/health',{signal:AbortSignal.timeout(3000)});
+    const r = await fetch(BACKEND_URL+'/api/health',{signal:AbortSignal.timeout(10000)});
     if(r.ok){
       const badge = document.getElementById('backendBadge');
       const host = BACKEND_URL.replace('https://','').replace('http://','').split('/')[0];
@@ -2181,14 +2181,14 @@ async function checkBackend(){
 
 async function fetchLiveNews(onProgress){
   // Primeiro checa quantos artigos existem em cache
-  const check = await fetch(BACKEND_URL+'/api/health',{signal:AbortSignal.timeout(5000)});
+  const check = await fetch(BACKEND_URL+'/api/health',{signal:AbortSignal.timeout(12000)});
   const health = await check.json();
   const total = health.articles || 24;
 
   if(onProgress) onProgress(10, 'Conectando '+total+' fontes RSS ao vivo...');
 
   // Força varredura nova com refresh=true
-  const r = await fetch(BACKEND_URL+'/api/news?limit=50&refresh=true',{signal:AbortSignal.timeout(30000)});
+  const r = await fetch(BACKEND_URL+'/api/news?limit=50&refresh=true',{signal:AbortSignal.timeout(45000)});
   if(!r.ok) throw new Error('HTTP '+r.status);
 
   if(onProgress) onProgress(70, 'Gerando conteudos editoriais · slides · reels...');
@@ -2334,21 +2334,20 @@ async function startScan(){
         finalize(btn);
       } else {
         setBackendBadge(false);
-        // Anima os passos restantes rapidamente e usa dados estáticos
-        const remaining = steps.length - stepIdx + 1;
-        let r = 0;
-        function tickStatic(){
-          advanceStep();
-          r++;
-          if(r < remaining) setTimeout(tickStatic, 180+Math.random()*120);
-          else finalize(btn);
-        }
-        setTimeout(tickStatic, 250);
+        // Backend não respondeu — retry automático (cold start Railway ~5-8s)
+        const lbl=document.getElementById('pLbl');
+        if(lbl) lbl.textContent='Backend iniciando... reconectando em 8s';
+        window._scanning=false;
+        setTimeout(()=>{ if(!window._scanning) startScan(); }, 8000);
+        return;
       }
     } catch(err) {
       console.warn('Backend error:', err);
       setBackendBadge(false);
-      finalize(btn);
+      const lbl=document.getElementById('pLbl');
+      if(lbl) lbl.textContent='Reconectando ao backend... retry em 8s';
+      window._scanning=false;
+      setTimeout(()=>{ if(!window._scanning) startScan(); }, 8000);
     }
   })();
 }
@@ -3031,7 +3030,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Preços ao vivo imediatamente
   fetchLivePrices();
   // Scan animação começa depois (conteúdo já está visível)
-  setTimeout(startScan,600);
+  // Auto-inicia scan com backend ao carregar
+  setTimeout(startScan, 1000);
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
 
