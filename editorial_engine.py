@@ -252,538 +252,529 @@ def pick_cta(cls: str, fmt: str) -> str:
 
 def reel_script(article: dict, fmt: str) -> str:
     """
-    Script de reel — 20-35 segundos de fala.
+    Roteiro de reel 20-35 segundos. 4 partes obrigatórias:
 
-    DNA (do guia editorial):
-    ─ Tom: narrador analítico. Professor que achou um dado e quer que
-      você entenda antes de todo mundo. Nunca hype, nunca FUD.
-    ─ Estrutura obrigatória:
-        ABERTURA  (5s) — dado ou contradição em 1 frase
-        DESENVOLVIMENTO (20s) — 3 dados concretos com números reais,
-                                 1 dado a cada ~6s
-        AVISO HONESTO (5s) — "Agora o aviso que eu preciso te dar..."
-        FECHAMENTO (5s) — ação ou reflexão, nunca CTA de compra
-    ─ Linguagem proibida: "vai subir", "moon", "compra agora",
-      "última chance", dados sem fonte ou período.
-    ─ Linguagem obrigatória: "historicamente", período exato,
-      valores em reais quando falar de impacto BR.
+    [ABERTURA 5s]    — 1 frase: dado/contradição que prende
+    [DESENVOLVIMENTO 20s] — 3 dados concretos com período e número real
+                            (não despeja excerpt bruto — SINTETIZA)
+    [AVISO HONESTO 5s] — "Agora o aviso que eu preciso te dar..."
+    [FECHAMENTO 5s]  — reflexão/ação, nunca CTA de compra
+
+    Proibido: "vai subir", "moon", dados sem período, excerpt cru.
+    Obrigatório: "historicamente", período exato (mês/ano), valores em R$.
+    Total: ~100-150 palavras (35s falado a 4 palavras/segundo).
     """
     title  = article.get("title", "")
-    excerpt = article.get("excerpt", article.get("desc", title))[:400]
-    source  = article.get("source_name", article.get("src", ""))
+    desc   = article.get("excerpt", article.get("desc", ""))
+    source = article.get("source_name", article.get("src", ""))
     cls    = article.get("_cls", article.get("cls", "edu"))
 
-    # Extrai números do título para tornar o script mais concreto
     import re
-    nums = re.findall(r"[\$R\€]?[\d,\.]+\s*(?:%|bilh|trilh|mil|k|m|b)?", title.lower())
-    num1 = nums[0].strip() if nums else ""
-    num2 = nums[1].strip() if len(nums) > 1 else ""
+    raw_nums = re.findall(
+        r"(?:US\$|R\$|\$|€)?\s*[\d]+(?:[,\.][\d]+)*\s*(?:bilh(?:ões|ao)?|trilh(?:ões|ao)?|milh(?:ões|ao)?|mil|k|m|b|%)?",
+        (title + " " + desc).lower()
+    )
+    nums = [n.strip() for n in raw_nums if n.strip() and len(n.strip()) > 1][:3]
+    n1 = nums[0] if nums else ""
+    n2 = nums[1] if len(nums) > 1 else ""
+    n3 = nums[2] if len(nums) > 2 else ""
+
+    historico_bear = (
+        "Novembro de 2018: Bitcoin a $3.200. Doze meses depois: $13.000. "
+        "Março de 2020: Bitcoin a $4.000. Treze meses depois: $58.000. "
+        "Novembro de 2022: Bitcoin a $15.000. Hoje: mais de 300% acima."
+    )
+    historico_etf = (
+        "Desde a aprovação dos ETFs spot em janeiro de 2024, "
+        "mais de $35 bilhões entraram via BlackRock e Fidelity. "
+        "Isso é demanda estrutural — não especulativa."
+    )
+    historico_br = (
+        "Quem compra Bitcoin em reais paga duas vezes: quando o BTC cai em dólar "
+        "e quando o dólar sobe em reais. "
+        "Com Selic acima de 10%, a renda fixa compete pelo mesmo capital."
+    )
+    aviso_base = "Agora o aviso que eu preciso te dar:"
 
     if fmt == "ALERTA_MERCADO":
-        aviso = f"Agora o aviso que eu preciso te dar: isso não significa que vai continuar caindo. Significa que o mercado está processando uma informação que a maioria ainda não entendeu."
+        num_dado = f"O dado central aqui: {n1}." if n1 else "O contexto é o que muda tudo."
         return f"""Deixa eu te mostrar o número que a mídia não contextualizou.
 
-{title}
+{num_dado}
 
-{excerpt}
+Primeiro dado: {historico_bear}
 
-Fonte: {source}.
+Segundo dado: nos três casos, os fundamentos on-chain não mudaram antes da recuperação. Só o sentimento mudou.
 
-{("O número central aqui: " + num1 + ". Mas o contexto é o que muda tudo." + chr(10)) if num1 else ""}Historicamente, eventos desse tipo geram dois momentos distintos: primeiro a reação emocional do varejo — que é rápida e exagerada. Depois a correção pelos dados reais — que é onde estão as oportunidades.
+Terceiro dado: a janela entre o pânico máximo e a recuperação foi de dias — não meses. Quem esperou certeza entrou mais caro.
 
-{aviso}
+{aviso_base} isso não significa que o fundo foi agora. Pode cair mais. Ciclos não têm calendário. O que a história documenta é o mecanismo — não a data.
 
-Salva esse vídeo. Não pela previsão. Pelo lembrete de como o mercado se comporta quando o medo está alto."""
+Salva esse vídeo. Não pela previsão. Pelo lembrete de como você estava se sentindo quando o medo estava alto."""
 
     elif fmt == "CORRENTE_IMPACTO":
-        return f"""Isso aconteceu lá fora. Deixa eu te mostrar como chega no seu bolso.
+        abertura_txt = "Isso aconteceu lá fora. Vou te mostrar exatamente onde isso chega no seu bolso."
+        dado_br = f"E no Brasil: dólar sobe, real cai. {historico_br}" if cls in ("br","geo","macro") else ""
+        return f"""{abertura_txt}
 
-{title}
+Primeiro dado: conflito ou incerteza global pressiona petróleo. Petróleo caro eleva inflação. Inflação alta faz o Fed hesitar em cortar juros.
 
-{excerpt}
+Segundo dado: quando o Fed hesita, dinheiro institucional sai de ativos de risco. Nasdaq corrige. Bitcoin vai junto — não porque os fundamentos cripto mudaram, mas porque algoritmos ainda classificam BTC como risco.
 
-Fonte: {source}.
+Terceiro dado: {dado_br if dado_br else "desde 2020, a correlação entre Bitcoin e Nasdaq em momentos de stress macro é de 0,7 — mais alta do que o mercado espera."}
 
-A corrente completa: esse evento pressiona o petróleo. Petróleo pressiona inflação global. Inflação faz o Fed hesitar em cortar juros. Mercados de risco corrigem. Bitcoin vai junto — não porque os fundamentos mudaram, mas porque os algoritmos institucionais ainda classificam BTC como ativo de risco.
-
-{("E no Brasil: dólar sobe, real cai, e quem compra Bitcoin em reais paga duas vezes." + chr(10)) if cls in ("br","geo","macro") else ""}
-Agora o aviso que eu preciso te dar: a corrente pode se desfazer em semanas. Quando o mercado percebe que os fundamentos cripto não mudaram, a recuperação costuma ser mais rápida do que a queda.
+{aviso_base} essa corrente pode se desfazer em semanas. Historicamente, quando o mercado percebe que os fundamentos cripto não mudaram, a recuperação é mais rápida que a queda.
 
 Salva esse vídeo. Não pela previsão. Pelo mecanismo."""
 
     elif fmt == "ANGULO_BRASIL":
         return f"""O número que quase ninguém está contextualizando pra quem investe no Brasil.
 
-{title}
+Primeiro dado: {historico_br}
 
-{excerpt}
+Segundo dado: um Bitcoin que sobe 20% em dólar, mas o dólar cai 15% contra o real, significa só 5% de ganho pra você. O inverso também é verdade — e a maioria dos iniciantes nunca calculou isso.
 
-Fonte: {source}.
+Terceiro dado: IOF mais taxas de conversão aumentam seu custo de entrada em até 6% antes de qualquer movimento do ativo.
 
-Três dados que a análise em inglês ignora: primeiro, você compra Bitcoin em dólar, mas investe em reais — o câmbio entra na equação antes de qualquer movimento de preço. Segundo, a Selic a dois dígitos compete diretamente com cripto pelo mesmo capital. Terceiro, o IOF e as taxas de conversão aumentam seu custo de entrada em até 6%.
+{aviso_base} isso não é pessimismo sobre o cripto. É a realidade de operar em país de moeda fraca com ativo dolarizado. Quem ignora essa equação toma decisão com metade das informações.
 
-Agora o aviso que eu preciso te dar: isso não é pessimismo. É a realidade de operar num país de moeda fraca com ativo dolarizado. Quem ignora essa equação toma decisão com metade das informações.
-
-O que você vai querer ter entendido daqui a 2 anos? Esse contexto."""
+Daqui a dois anos, quando você olhar pra esse momento, vai querer ter entendido isso antes."""
 
     elif fmt == "CONTRAINTUITIVO":
-        return f"""A narrativa dominante sobre isso está errada. Vou te mostrar os dados.
+        num_dado = f"O dado central: {n1}. Parece ruim. O histórico diz outra coisa." if n1 else "A narrativa dominante está errada. Os dados dizem o oposto."
+        return f"""{num_dado}
 
-{title}
+Primeiro dado: {historico_bear}
 
-{excerpt}
+Segundo dado: nos três casos, o que diferenciou quem ganhou de quem perdeu não foi timing. Foi a resposta a uma pergunta simples: os fundamentos do ativo mudaram?
 
-Fonte: {source}.
+Terceiro dado: on-chain, nos três fundos históricos, a acumulação de wallets de longo prazo aumentou enquanto o preço caía. Demanda silenciosa antes da recuperação pública.
 
-{("O número central: " + num1 + ". Parece ruim. Mas o histórico diz outra coisa." + chr(10)) if num1 else ""}Historicamente, os momentos de maior medo no cripto — novembro 2018, março 2020, novembro 2022 — foram os melhores pontos de entrada documentados. Não porque alguém previu. Porque os fundamentos não tinham mudado, só o sentimento.
-
-Agora o aviso que eu preciso te dar: isso não significa que vai repetir agora. Significa que a pergunta certa não é "vai subir?" — é "os fundamentos mudaram?"
+{aviso_base} isso não significa que vai repetir agora. Significa que a pergunta certa não é "vai subir?" — é "os fundamentos mudaram?"
 
 Salva esse vídeo. Vai ser útil quando o medo estiver maior do que está agora."""
 
     elif fmt == "PREVISAO_ACERTADA":
+        num_dado = f"O dado específico apontado: {n1}." if n1 else ""
         return f"""Isso aconteceu 3 vezes na história. Vou te contar o que veio depois.
 
-{title}
+{num_dado}
 
-{excerpt}
+Primeiro dado: analistas com bom track record não são sortudos — eles enxergam conexões antes do mercado precificar. A janela entre o insight e o consenso é onde estão os maiores retornos documentados.
 
-Fonte: {source}.
+Segundo dado: {historico_etf}
 
-{("O dado específico que está sendo apontado: " + num1 + "." + chr(10)) if num1 else ""}Analistas que acertam previsões improváveis não são sortudos — eles enxergam conexões que o mercado ainda não precificou. E quando o mercado finalmente precifica, já é tarde para a maioria.
+Terceiro dado: historicamente, quando análise vai contra o consenso e o consenso está errado, a correção de preço é proporcional ao tamanho da divergência.
 
-Agora o aviso que eu preciso te dar: bom histórico não é garantia. A questão é entender o raciocínio por trás — não seguir cegamente.
+{aviso_base} bom histórico não é garantia. Nenhum analista acerta 100% do tempo. O que importa é entender o raciocínio — não seguir cegamente.
 
 O que você vai querer ter feito daqui a 4 anos quando olhar pra esse momento?"""
 
     elif fmt == "COMPARACAO_HISTORICA":
-        return f"""Isso já aconteceu antes. Deixa eu te contar o que veio depois.
+        return f"""Isso já aconteceu antes. Deixa eu te contar exatamente o que veio depois.
 
-{title}
+Primeiro dado: março de 2020 — Bitcoin caiu 50% em 48 horas. Treze meses depois: alta de 1.200% do fundo. Quem comprou no pânico multiplicou por 12.
 
-{excerpt}
+Segundo dado: novembro de 2022 — colapso FTX, inflação, guerra. Bitcoin a $15.000. Hoje, quem comprou entre $15k e $20k tem mais de 300%. Em ambos os casos: fundamentos intactos, só o sentimento tinha mudado.
 
-Fonte: {source}.
+Terceiro dado: {historico_etf}
 
-Três paralelos documentados: março de 2020, Bitcoin caiu 50% em 48 horas e subiu 1.200% nos 13 meses seguintes. Novembro de 2022, colapso FTX mais inflação mais guerra — Bitcoin a $15k, quem comprou ali tem mais de 300% hoje. Em todos os casos: os fundamentos não tinham mudado. Só o sentimento.
-
-Agora o aviso que eu preciso te dar: a história não se repete com as mesmas datas e os mesmos números. O que se repete é o mecanismo — pânico de varejo, acumulação silenciosa, recuperação quando o consenso muda.
+{aviso_base} a história não se repete com as mesmas datas e os mesmos números. O que se repete é o mecanismo: pânico de varejo, acumulação silenciosa, recuperação quando o consenso muda.
 
 Salva esse vídeo. Não pela previsão. Pelo registro histórico."""
 
-    else:  # EDUCATIVO_CONTEXTO
-        return f"""Deixa eu te mostrar o contexto que está faltando nessa notícia.
+    else:
+        num_dado = f"O número que muda a leitura: {n1}." if n1 else "O contexto que está faltando nessa notícia."
+        return f"""Deixa eu te mostrar o contexto que quase ninguém está contextualizando.
 
-{title}
+{num_dado}
 
-{excerpt}
+Primeiro dado: o mercado processa informações em camadas. Primeiro a manchete — reação emocional, rápida e exagerada. Depois o contexto — onde estão as decisões que realmente importam. A maioria das pessoas só chega na primeira camada.
 
-Fonte: {source}.
+Segundo dado: {historico_etf}
 
-{("O número que muda a leitura: " + num1 + "." + chr(10)) if num1 else ""}O mercado processa informações em camadas: primeiro a manchete — reação emocional, rápida e geralmente exagerada. Depois o contexto — onde estão as decisões que realmente importam. A maioria das pessoas só chega na primeira camada.
+Terceiro dado: historicamente, quando narrativa e fundamentos divergem, os fundamentos sempre vencem — com atraso de dias ou semanas. É nessa defasagem que estão as oportunidades documentadas.
 
-Agora o aviso que eu preciso te dar: entender o contexto não é pra você agir impulsivamente. É pra você não agir por medo. A diferença entre quem perde e quem ganha nesse mercado, na maioria das vezes, não é timing — é clareza.
+{aviso_base} entender o contexto não é pra você agir impulsivamente. É pra você não agir por medo.
 
 Salva esse vídeo. Vai ser útil quando o medo estiver maior do que está agora."""
 
 
+
 def carousel_slides(article: dict, fmt: str) -> list:
     """
-    Carrossel 7-9 slides — DNA do guia editorial:
+    Carrossel 7-9 slides. DNA do guia editorial:
 
-    SLIDE 1 CAPA: contradição ou dado impossível
-      → "Quem está perdendo dinheiro AGORA não é quem você pensa"
-      → A capa deve fazer o leitor pensar "isso não pode estar certo"
-      → NUNCA: "Bitcoin caiu 47%"
-
-    SLIDES 2-3 CONTEXTO: número da mídia vs número real
-      → Inclui período exato, valor investido, retorno em reais
-
-    SLIDES 4-6 PROFUNDIDADE:
-      → Dados on-chain, histórico de ciclos
-      → AVISO HONESTO obrigatório (slide dedicado)
-      → Nunca pula o aviso
-
-    SLIDES 7-8 MECANISMO:
-      → Por que estrutural, não "vai subir"
-      → Foca no que mudou nesse ciclo vs. anteriores
-
-    SLIDE 9 FECHAMENTO:
-      → Ação concreta OU pergunta reflexiva
-      → Fórmula: "Salva esse carrossel. Não pela análise.
-                   Pelo registro de como você estava se sentindo agora."
+    SLIDE 1 — CAPA: contradição/dado impossível (nunca "Bitcoin caiu X%")
+    SLIDES 2-3 — CONTEXTO: número da mídia vs número real, período exato
+    SLIDES 4-6 — PROFUNDIDADE: on-chain + AVISO HONESTO obrigatório
+    SLIDES 7-8 — MECANISMO: por que estrutural, o que mudou nesse ciclo
+    SLIDE 9 — FECHAMENTO: salva pelo registro, não pela análise
     """
     title   = article.get("title", "")
-    excerpt = article.get("excerpt", article.get("desc", title))[:500]
+    desc    = article.get("excerpt", article.get("desc", ""))
     source  = article.get("source_name", article.get("src", ""))
     cls     = article.get("_cls", article.get("cls", "edu"))
 
     import re
-    nums = re.findall(r"[\$R\€]?[\d,\.]+\s*(?:%|bilh|trilh|mil|k|m|b)?", title.lower())
-    num1 = nums[0].strip() if nums else ""
-    num2 = nums[1].strip() if len(nums) > 1 else ""
+    raw_nums = re.findall(
+        r"(?:US\$|R\$|\$|€)?\s*[\d]+(?:[,\.][\d]+)*\s*(?:bilh(?:ões|ao)?|trilh(?:ões|ao)?|milh(?:ões|ao)?|mil|k|m|b|%)?",
+        (title + " " + desc).lower()
+    )
+    nums = [n.strip() for n in raw_nums if n.strip() and len(n.strip()) > 1][:3]
+    n1 = nums[0] if nums else ""
+    n2 = nums[1] if len(nums) > 1 else ""
 
     def capa(txt, img=""):
         return {"role": "capa",  "t": txt, "img": img, "arrow": False}
     def corpo(txt, img=""):
         return {"role": "corpo", "t": txt + "\n\n👇", "img": img, "arrow": True}
     def aviso(txt):
-        return {"role": "aviso", "t": "⚠️ O AVISO HONESTO\n\n" + txt, "img": "", "arrow": True}
+        return {"role": "aviso", "t": "⚠️ O AVISO HONESTO\n\n" + txt + "\n\n👇", "img": "", "arrow": True}
     def mecanismo(txt, img=""):
         return {"role": "mecanismo", "t": txt + "\n\n👇", "img": img, "arrow": True}
     def final(txt):
-        return {"role": "final", "t": txt, "img": "", "arrow": False}
+        return {"role": "final",  "t": txt, "img": "", "arrow": False}
 
-    # ── ALERTA_MERCADO ────────────────────────────────────────────────────────
+    H_BEAR = (
+        "**Março de 2020:** BTC −50% em 48h → +1.200% nos 13 meses seguintes.\n\n"
+        "**Novembro de 2022:** FTX + inflação + guerra → BTC a $15k → +300% hoje.\n\n"
+        "Nos dois casos: fundamentos intactos. Só o sentimento tinha mudado."
+    )
+    H_ETF = (
+        "Desde a aprovação dos ETFs spot em **janeiro de 2024**, mais de "
+        "**$35 bilhões** entraram via BlackRock e Fidelity.\n\n"
+        "Demanda estrutural — não especulativa."
+    )
+    H_BR = (
+        "Você compra BTC em dólar, mas investe em reais.\n\n"
+        "BTC +20% em dólar + dólar −15% em reais = só **+5% pra você**.\n\n"
+        "Com Selic acima de 10%, a renda fixa compete pelo mesmo capital."
+    )
+
     if fmt == "ALERTA_MERCADO":
+        num_ctx = f"O dado central: **{n1}**." if n1 else ""
         return [
             capa(
-                f"Quem está ERRANDO agora não é quem você pensa.\n\n**{title}**",
-                img="gráfico queda dramática — dark editorial"
+                "Quem está ERRANDO agora não é quem você pensa.\n\n"
+                f"**{title}**",
+                img="gráfico queda — dark editorial, vermelho"
             ),
             corpo(
-                f"**O que a mídia está dizendo:**\n\n{excerpt}\n\nFonte: {source}.",
+                "**O número que a mídia está usando:**\n\n"
+                f"{num_ctx}\n\nFonte: {source}.\n\n"
+                "Esse é o número que chama atenção. Não é o número que importa.",
                 img="print da notícia"
             ),
             corpo(
-                f"**O número que quase ninguém está contextualizando:**\n\n"
-                f"{'Dado central: ' + num1 + chr(10) + chr(10) if num1 else ''}"
-                f"Em março de 2020, Bitcoin caiu **50% em 48 horas**. "
-                f"Quem comprou no pânico subiu **+1.200%** nos 13 meses seguintes.\n\n"
-                f"Em novembro de 2022, FTX colapsou. Bitcoin a **$15k**. "
-                f"Retorno para quem comprou: **+300%** até hoje.\n\n"
-                f"Nos dois casos: os fundamentos não tinham mudado. Só o sentimento.",
+                "**O número que realmente importa:**\n\n" + H_BEAR,
                 img="gráfico histórico BTC ciclos"
             ),
             corpo(
-                f"**O que os dados on-chain mostram agora:**\n\n"
-                f"Quando grandes players vendem no varejo e acumulam on-chain, "
-                f"o movimento de preço e o movimento real de Bitcoin vão em direções opostas.\n\n"
-                f"Esse padrão precedeu as duas maiores recuperações documentadas.",
+                "**O que os dados on-chain mostram:**\n\n"
+                "Quando grandes wallets acumulam enquanto o varejo vende, "
+                "o movimento de preço e o movimento real de Bitcoin vão em "
+                "direções opostas.\n\n"
+                "Esse padrão precedeu as duas maiores recuperações documentadas.\n\n"
+                "Os dados on-chain são o que o preço ainda não refletiu."
             ),
             aviso(
-                f"Isso não significa que vai parar de cair agora.\n\n"
-                f"Pode cair mais. Pode demorar mais. Ciclos não têm calendário.\n\n"
-                f"O que a história documenta é o mecanismo — não a data.\n\n"
-                f"Quem age com certeza em momentos de pânico geralmente está errado."
+                "Isso não significa que o fundo foi agora. Pode cair mais.\n\n"
+                "Ciclos não têm calendário e a história não se repete com as mesmas datas.\n\n"
+                "O que se documenta é o **mecanismo** — não o timing.\n\n"
+                "Quem age com certeza absoluta em momentos de pânico geralmente paga por isso."
             ),
             corpo(
-                f"**O que monitorar nas próximas 48-72h:**\n\n"
-                f"Volume de Bitcoin saindo de exchanges (acumulação ou fuga?).\n\n"
-                f"Open interest em futuros (alavancagem acumulada = risco de liquidação).\n\n"
-                f"Dominância do BTC vs altcoins (rotação de capital ou saída total?).",
+                "**O que monitorar nas próximas 48-72h:**\n\n"
+                "• Saída de BTC das exchanges (acumulação ou fuga de capital?)\n\n"
+                "• Open interest em futuros (alavancagem acumulada = risco de cascata)\n\n"
+                "• Dominância BTC vs altcoins (rotação ou saída total?)\n\n"
+                "Esses três dados dizem mais do que qualquer manchete."
             ),
             mecanismo(
-                f"**O mecanismo que se repete:**\n\n"
-                f"1. Evento externo gera pânico.\n"
-                f"2. Varejo vende. Institucional acumula.\n"
-                f"3. Preço vai contra o movimento real de BTC.\n"
-                f"4. Quando o consenso muda, o preço ajusta rapidamente.\n\n"
-                f"A janela de oportunidade costuma ser de dias, não semanas.",
-                img="diagrama ciclo de pânico"
+                "**O mecanismo que se repete em todos os ciclos:**\n\n"
+                "1 — Evento externo → narrativa negativa dominante\n"
+                "2 — Varejo vende. Smart money observa fundamentos.\n"
+                "3 — Preço diverge do valor real do ativo.\n"
+                "4 — Convergência rápida quando o consenso muda.\n\n"
+                "**A pergunta que separa quem ganha: os fundamentos mudaram?**",
+                img="diagrama ciclo pânico/acumulação"
             ),
             final(
-                f"Salva esse carrossel.\n\n"
-                f"Não pela análise.\n\n"
-                f"**Pelo registro de como você estava se sentindo agora.**\n\n"
-                f"Daqui a 4 anos, quando você olhar pra esse momento, vai querer lembrar o que escolheu fazer com o medo.\n\n"
-                f"@criptobrasilofc"
+                "Salva esse carrossel.\n\n"
+                "Não pela análise.\n\n"
+                "**Pelo registro de como você estava se sentindo agora.**\n\n"
+                "Daqui a 4 anos, quando você olhar pra esse momento, "
+                "vai querer lembrar o que escolheu fazer com o medo.\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
-    # ── CORRENTE_IMPACTO ──────────────────────────────────────────────────────
     elif fmt == "CORRENTE_IMPACTO":
         return [
             capa(
-                f"Parece distante. Não é.\n\n**{title}**\n\nDeixa eu te mostrar onde isso chega.",
-                img="mapa geopolítico dark com linhas de conexão"
+                "Parece distante. Não é.\n\n"
+                f"**{title}**\n\nDeixa eu te mostrar onde isso chega.",
+                img="mapa geopolítico dark — linhas de conexão, azul"
             ),
             corpo(
-                f"**O que aconteceu:**\n\n{excerpt}\n\nFonte: {source}.",
+                f"**O que a mídia está cobrindo:**\n\nFonte: {source}.\n\n"
+                "Esse é o evento. Agora o contexto que está faltando.",
                 img="imagem do evento"
             ),
             corpo(
-                f"**Elo 1 — Energia e inflação:**\n\n"
-                f"Instabilidade em regiões produtoras pressiona o barril.\n\n"
-                f"Petróleo caro encarece logística, produção, tudo.\n\n"
-                f"Fed, que estava prestes a cortar juros, hesita.\n\n"
-                f"**Cortar juros com inflação subindo seria um erro histórico.**",
-                img="gráfico petróleo vs inflação"
+                "**Elo 1 — energia e inflação:**\n\n"
+                "Instabilidade global pressiona o petróleo.\n\n"
+                "Petróleo caro eleva inflação. Fed hesita em cortar juros.\n\n"
+                "**Cortar juros com inflação subindo seria um erro histórico.**",
+                img="gráfico petróleo vs CPI"
             ),
             corpo(
-                f"**Elo 2 — Mercados de risco:**\n\n"
-                f"A alta dos mercados foi alimentada pela expectativa de cortes.\n\n"
-                f"Quando essa expectativa recua, o dinheiro institucional sai.\n\n"
-                f"Ações de tech caem. Nasdaq corrige. **Bitcoin vai junto** — "
-                f"não porque os fundamentos mudaram, mas porque os algoritmos "
-                f"ainda classificam BTC como ativo de risco.",
-                img="gráfico Nasdaq vs BTC correlação"
+                "**Elo 2 — mercados de risco:**\n\n"
+                "A alta de 2023-2024 foi alimentada pela expectativa de cortes.\n\n"
+                "Quando essa expectativa recua, dinheiro institucional sai.\n\n"
+                "Nasdaq corrige. **Bitcoin vai junto** — correlação 0.7 em stress macro.",
+                img="gráfico BTC vs Nasdaq"
             ),
             corpo(
-                f"**Elo 3 — O Brasil:**\n\n"
-                f"Turbulência global = dólar forte = real fraco.\n\n"
-                f"Quem compra Bitcoin em reais **paga duas vezes**:\n\n"
-                f"Quando o BTC cai em dólar — e quando o dólar sobe em reais.\n\n"
-                f"Esse duplo efeito é ignorado por quem só olha o preço em dólar.",
+                "**Elo 3 — o Brasil:**\n\n" + H_BR,
                 img="gráfico USD/BRL"
             ),
             aviso(
-                f"Essa corrente pode se desfazer mais rápido do que se formou.\n\n"
-                f"Quando o mercado percebe que os fundamentos cripto não mudaram, "
-                f"a recuperação costuma ser mais rápida do que a queda.\n\n"
-                f"Isso não é previsão. É o registro histórico de como esse mecanismo funciona."
+                "Essa corrente pode se desfazer mais rápido do que se formou.\n\n"
+                "Historicamente, quando o mercado percebe que os fundamentos cripto "
+                "não mudaram, a recuperação é mais rápida que a queda.\n\n"
+                "Isso não é previsão. É o registro de como esse mecanismo "
+                "funcionou em 2020 e 2022."
             ),
             mecanismo(
-                f"**O que mudou nesse ciclo vs. anteriores:**\n\n"
-                f"ETFs de Bitcoin aprovados = demanda institucional estrutural.\n\n"
-                f"Halving de 2024 = redução de oferta já precificada no long run.\n\n"
-                f"Adoção corporativa crescente = base de suporte mais alta a cada ciclo.\n\n"
-                f"**O contexto macro muda o preço de curto prazo.\n"
-                f"Os fundamentos determinam o piso de longo prazo.**",
-                img="timeline ciclos BTC com ETFs"
+                "**O que mudou nesse ciclo vs. anteriores:**\n\n"
+                + H_ETF + "\n\n"
+                "**Contexto macro muda o timing. Fundamentos determinam o piso.**",
+                img="timeline ciclos BTC"
             ),
             final(
-                f"Entender a corrente inteira é o que separa quem reage de quem antecipa.\n\n"
-                f"**O evento aconteceu lá fora. O impacto chega aqui.**\n\n"
-                f"Salva esse carrossel. Vai ser útil quando o próximo evento aparecer.\n\n"
-                f"@criptobrasilofc"
+                "Entender a corrente inteira é o que separa quem reage de quem antecipa.\n\n"
+                "**Salva esse carrossel. Vai ser útil quando o próximo evento aparecer.**\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
-    # ── ANGULO_BRASIL ─────────────────────────────────────────────────────────
     elif fmt == "ANGULO_BRASIL":
         return [
             capa(
-                f"Ninguém está te contando o que isso significa **em reais**.\n\n**{title}**",
-                img="mapa Brasil + tela Bloomberg dark"
+                "Ninguém está te contando o que isso significa **em reais**.\n\n"
+                f"**{title}**",
+                img="mapa Brasil + Bloomberg dark, verde/amarelo"
             ),
             corpo(
-                f"**O que aconteceu:**\n\n{excerpt}\n\nFonte: {source}.",
-                img="print da notícia"
+                f"**O número que todo mundo está lendo:**\n\n"
+                f"{f'Dado central: **{n1}**.'+chr(10)+chr(10) if n1 else ''}"
+                f"Fonte: {source}.\n\n"
+                "Mas esse número ignora 3 variáveis críticas pra quem está no Brasil.",
+                img="print da análise em inglês"
             ),
             corpo(
-                f"**O número que a análise em inglês ignora:**\n\n"
-                f"Um Bitcoin que sobe **20% em dólar**, mas o dólar cai **15%** contra o real "
-                f"= só **5% de ganho** pra você.\n\n"
-                f"O contrário também é verdade: BTC estável em dólar + dólar subindo "
-                f"= você lucrou sem nenhum movimento do ativo.\n\n"
-                f"**A maioria dos iniciantes em cripto no Brasil nunca calculou isso.**",
+                "**O número que realmente importa pra você:**\n\n" + H_BR,
             ),
             corpo(
-                f"**Três variáveis que o investidor BR precisa monitorar:**\n\n"
-                f"**1.** Preço do BTC em reais, não só em dólar.\n\n"
-                f"**2.** Selic: a renda fixa compete diretamente com cripto pelo mesmo capital. "
-                f"Com Selic acima de 10%, o custo de oportunidade é real.\n\n"
-                f"**3.** IOF + taxas: aumentam seu custo de entrada em até 6% antes de qualquer movimento.",
+                "**As 3 variáveis que a análise em inglês ignora:**\n\n"
+                "**1.** Câmbio: você compra em dólar, investe em reais.\n\n"
+                "**2.** Selic: com juros a dois dígitos, renda fixa compete "
+                "diretamente com cripto pelo mesmo capital.\n\n"
+                "**3.** IOF + taxas: aumentam seu custo de entrada em **até 6%**."
             ),
             aviso(
-                f"Isso não é pessimismo sobre o cripto.\n\n"
-                f"É a realidade de operar em país de moeda fraca com ativo dolarizado.\n\n"
-                f"Ignorar essa equação não faz ela desaparecer.\n\n"
-                f"Entendê-la é uma vantagem competitiva real frente a quem só lê análise em inglês."
+                "Isso não é pessimismo sobre o cripto.\n\n"
+                "É a realidade de operar num país de moeda fraca "
+                "com ativo dolarizado.\n\n"
+                "Ignorar essa equação não faz ela desaparecer.\n\n"
+                "Entendê-la é uma **vantagem competitiva real** frente a quem só lê em inglês."
             ),
             mecanismo(
-                f"**O que os melhores investidores BR fazem diferente:**\n\n"
-                f"Acompanham o preço do BTC **em reais** como dado primário.\n\n"
-                f"Usam DCA em reais com disciplina — não tentam acertar câmbio e BTC ao mesmo tempo.\n\n"
-                f"Mantêm parte em stablecoins dolarizadas para aproveitar oportunidades "
-                f"quando real e BTC estão simultaneamente favoráveis.",
+                "**O que os melhores investidores BR fazem diferente:**\n\n"
+                "Acompanham o preço do BTC **em reais** — não só em dólar.\n\n"
+                "Usam DCA em reais com disciplina.\n\n"
+                "Mantêm parte em stablecoins para aproveitar quando real e BTC "
+                "estão simultaneamente favoráveis.",
             ),
             final(
-                f"O investidor brasileiro que ignora o contexto cambial e de juros "
-                f"está tomando decisão com metade das informações.\n\n"
-                f"**Salva esse carrossel. Vai mudar como você lê qualquer análise de cripto.**\n\n"
-                f"@criptobrasilofc"
+                "O investidor brasileiro que ignora o contexto cambial "
+                "está tomando decisão com metade das informações.\n\n"
+                "**Salva esse carrossel. Vai mudar como você lê qualquer análise de cripto.**\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
-    # ── CONTRAINTUITIVO ───────────────────────────────────────────────────────
     elif fmt == "CONTRAINTUITIVO":
+        num_ctx = f"O dado central: **{n1}**. Parece ruim." if n1 else "Parece ruim."
         return [
             capa(
-                f"Parece ruim. Os dados dizem o oposto.\n\n**{title}**",
-                img="gráfico aparentemente negativo com seta verde"
+                f"{num_ctx} Os dados dizem o oposto.\n\n**{title}**",
+                img="gráfico aparentemente negativo com reversão — dark, amarelo"
             ),
             corpo(
-                f"**O que todo mundo está dizendo:**\n\n{excerpt}\n\nFonte: {source}.",
+                f"**O que todo mundo está dizendo:**\n\nFonte: {source}.\n\n"
+                "Esse é o consenso. Agora o contexto que o consenso ignora.",
             ),
             corpo(
-                f"**O número que quase ninguém está contextualizando:**\n\n"
-                f"{'Dado central: ' + num1 + chr(10) + chr(10) if num1 else ''}"
-                f"Em novembro de 2018, narrativa idêntica. Bitcoin a $3.200. "
-                f"12 meses depois: $13.000.\n\n"
-                f"Em março de 2020, narrativa idêntica. Bitcoin a $4.000. "
-                f"12 meses depois: $58.000.\n\n"
-                f"**Nos dois casos, o mercado estava errado sobre o que os dados mostravam.**",
+                "**O número que a mídia usa vs. o número que importa:**\n\n" + H_BEAR,
+                img="gráfico histórico BTC"
             ),
             corpo(
-                f"**Por que o consenso erra nesses momentos:**\n\n"
-                f"O mercado precifica o que já é consenso — e o consenso é sempre atrasado.\n\n"
-                f"O que está acontecendo agora ainda não é consenso. Ainda não está nos preços.\n\n"
-                f"Quando virar consenso, a oportunidade já terá passado para a maioria.",
+                "**Por que o consenso erra nesses momentos:**\n\n"
+                "O mercado precifica o que já é consenso — e consenso é sempre atrasado.\n\n"
+                "O que está acontecendo agora ainda não está nos preços.\n\n"
+                "Quando virar consenso, a oportunidade já terá passado."
             ),
             aviso(
-                f"Dados históricos não são garantia de repetição.\n\n"
-                f"O Bitcoin pode cair mais. O ciclo pode demorar mais.\n\n"
-                f"O que a história documenta é o **mecanismo** — não o calendário.\n\n"
-                f"Quem age com certeza absoluta em qualquer direção geralmente paga por isso."
+                "Dados históricos não são garantia de repetição.\n\n"
+                "Pode cair mais. Pode demorar mais. Pode ser diferente dessa vez.\n\n"
+                "O que a história documenta é o **mecanismo** — não o calendário.\n\n"
+                "Quem age com certeza absoluta em qualquer direção geralmente paga por isso."
             ),
             mecanismo(
-                f"**O mecanismo por trás do contraintuitivo:**\n\n"
-                f"1. Evento negativo → narrativa pessimista dominante.\n"
-                f"2. Varejo vende. Smart money observa fundamentos.\n"
-                f"3. Se fundamentos intactos → divergência entre preço e valor.\n"
-                f"4. Convergência: rápida, quando o consenso finalmente muda.\n\n"
-                f"**A pergunta certa: os fundamentos mudaram ou só o sentimento?**",
+                "**O mecanismo do contraintuitivo:**\n\n"
+                "1 — Evento negativo → narrativa pessimista dominante.\n"
+                "2 — Varejo vende. Quem tem tese observa fundamentos.\n"
+                "3 — Fundamentos intactos → divergência entre preço e valor.\n"
+                "4 — Convergência rápida quando o consenso muda.\n\n"
+                "**A pergunta: os fundamentos mudaram ou só o sentimento?**",
+                img="diagrama divergência preço/valor"
             ),
             final(
-                f"Salva esse carrossel.\n\n"
-                f"Não pela conclusão.\n\n"
-                f"**Pelo registro de como o mercado estava se sentindo agora.**\n\n"
-                f"Daqui a alguns anos, vai ser útil ver esse momento de fora.\n\n"
-                f"@criptobrasilofc"
+                "Salva esse carrossel.\n\nNão pela conclusão.\n\n"
+                "**Pelo registro de como o mercado estava se sentindo agora.**\n\n"
+                "Daqui a alguns anos, vai ser útil ver esse momento de fora.\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
-    # ── PREVISAO_ACERTADA ─────────────────────────────────────────────────────
     elif fmt == "PREVISAO_ACERTADA":
+        num_ctx = f"O dado específico apontado: **{n1}**." if n1 else ""
         return [
             capa(
-                f"Ele disse isso meses atrás. O mercado ignorou. Aconteceu.\n\n**{title}**",
-                img="print da previsão + gráfico confirmando"
+                "Ele disse isso quando o mercado não queria ouvir. Aconteceu.\n\n"
+                f"**{title}**\n\nAgora está dizendo algo novo.",
+                img="print da previsão + gráfico confirmando — dark, verde"
             ),
             corpo(
-                f"**O contexto completo:**\n\n{excerpt}\n\nFonte: {source}.",
+                f"**O contexto:**\n\n{num_ctx}\n\nFonte: {source}.\n\n"
+                "Antes de continuar, deixa eu te contar o histórico.",
                 img="print da análise original"
             ),
             corpo(
-                f"**Por que bom histórico importa:**\n\n"
-                f"Analistas com track record não são sortudos.\n\n"
-                f"Eles enxergam conexões que o mercado ainda não precificou — "
-                f"e agem antes do consenso se formar.\n\n"
-                f"{'O dado específico apontado: ' + num1 + chr(10) + chr(10) if num1 else ''}"
-                f"É exatamente nessa janela — entre o insight e o consenso — "
-                f"que estão os maiores retornos documentados.",
-            ),
-            aviso(
-                f"Bom histórico não é garantia de acerto futuro.\n\n"
-                f"Nenhum analista acerta 100% do tempo.\n\n"
-                f"O que importa entender é **o raciocínio por trás** — não só a conclusão.\n\n"
-                f"Seguir cegamente qualquer analista, independente do histórico, é tão perigoso "
-                f"quanto ignorá-los completamente."
+                "**Por que bom histórico importa:**\n\n"
+                "Analistas com track record enxergam conexões antes do mercado precificar.\n\n"
+                "A janela entre o insight e o consenso é onde estão "
+                "os maiores retornos documentados da história do cripto.",
             ),
             corpo(
-                f"**O que você deve fazer com essa informação:**\n\n"
-                f"Não copiar. Entender.\n\n"
-                f"Pegar o raciocínio, verificar os dados na fonte, e então decidir "
-                f"se faz sentido **para a sua situação específica**.\n\n"
-                f"Portfólio é pessoal. Contexto é universal.",
+                "**O contexto atual:**\n\n" + H_ETF,
+                img="gráfico fluxo ETFs"
+            ),
+            aviso(
+                "Bom histórico não é garantia de acerto futuro.\n\n"
+                "Nenhum analista acerta 100% do tempo.\n\n"
+                "O que importa é entender o **raciocínio** — não só a conclusão.\n\n"
+                "Seguir cegamente qualquer analista é tão perigoso quanto ignorá-los."
             ),
             mecanismo(
-                f"**O padrão que analistas com bom histórico têm em comum:**\n\n"
-                f"Ignoram o consenso quando os dados apontam outra direção.\n\n"
-                f"Dão mais peso a dados on-chain do que a sentimento de mercado.\n\n"
-                f"Fazem previsões impopulares quando o momento exige — e ficam quietos "
-                f"quando não têm convicção.",
+                "**O padrão dos analistas com bom histórico:**\n\n"
+                "Ignoram o consenso quando dados apontam outra direção.\n\n"
+                "Dão mais peso a dados on-chain do que a sentimento.\n\n"
+                "**Raramente estão certos toda vez. Mas quando estão, a margem é grande.**",
             ),
             final(
-                f"Você não precisa concordar com tudo que especialistas dizem.\n\n"
-                f"Mas precisa saber o que estão dizendo.\n\n"
-                f"**Salva esse carrossel. A pergunta certa não é 'ele está certo?'\n"
-                f"É 'qual o raciocínio dele e ele bate com os dados?'**\n\n"
-                f"@criptobrasilofc"
+                "**A pergunta certa: qual o raciocínio dele e ele bate com os dados?**\n\n"
+                "Salva esse carrossel.\n\n@criptobrasilofc"
             ),
         ]
 
-    # ── COMPARACAO_HISTORICA ──────────────────────────────────────────────────
     elif fmt == "COMPARACAO_HISTORICA":
         return [
             capa(
-                f"Isso já aconteceu antes. Exatamente assim.\n\n**{title}**\n\nDeixa eu te mostrar o que veio depois.",
-                img="gráfico histórico longo prazo BTC"
+                "Isso já aconteceu antes. Exatamente assim.\n\n"
+                f"**{title}**\n\nDeixa eu te mostrar o que veio depois.",
+                img="gráfico histórico longo prazo BTC — dark, cinza/amarelo"
             ),
             corpo(
-                f"**O evento de hoje:**\n\n{excerpt}\n\nFonte: {source}.",
+                f"**O evento de hoje:**\n\nFonte: {source}.\n\n"
+                "Antes de reagir, veja o padrão histórico.",
             ),
             corpo(
-                f"**Março de 2020:**\n\nCOVID. Lockdown global. Pânico total.\n\n"
-                f"Bitcoin caiu **-50% em 48 horas**. Narrativa: 'acabou'.\n\n"
-                f"13 meses depois: **+1.200%** do fundo.\n\n"
-                f"Quem comprou no pânico multiplicou por 12.",
+                "**Março de 2020 — paralelo 1:**\n\n"
+                "COVID. Lockdown global. Pânico total.\n\n"
+                "Bitcoin: **−50% em 48 horas**. Narrativa: 'acabou'.\n\n"
+                "13 meses depois: **+1.200%** do fundo. Quem comprou no pânico multiplicou por 12.",
                 img="gráfico BTC março 2020"
             ),
             corpo(
-                f"**Novembro de 2022:**\n\nColapso FTX + inflação + guerra.\n\n"
-                f"Bitcoin a **$15.000**. Narrativa: 'crypto morreu'.\n\n"
-                f"Resultado para quem comprou entre $15k e $20k: **+300%** hoje.\n\n"
-                f"**Nos dois casos: fundamentos intactos. Só o sentimento mudou.**",
+                "**Novembro de 2022 — paralelo 2:**\n\n"
+                "FTX + inflação + guerra. Bitcoin a **$15.000**. Narrativa: 'crypto morreu'.\n\n"
+                "Retorno para quem comprou entre $15k e $20k: **+300%** hoje.\n\n"
+                "**Nos dois casos: fundamentos intactos. Só o sentimento mudou.**",
                 img="gráfico BTC novembro 2022"
             ),
             aviso(
-                f"A história não se repete com as mesmas datas e os mesmos números.\n\n"
-                f"Pode cair mais. Pode demorar mais. Pode ser diferente dessa vez.\n\n"
-                f"O que se repete é o **mecanismo**: pânico de varejo, acumulação silenciosa, "
-                f"recuperação quando o consenso muda.\n\n"
-                f"Isso não é previsão. É o registro histórico documentado."
+                "A história não se repete com as mesmas datas e os mesmos números.\n\n"
+                "Pode cair mais. Pode demorar mais. Pode ser diferente dessa vez.\n\n"
+                "O que se repete é o **mecanismo**: pânico de varejo, acumulação silenciosa, "
+                "recuperação quando o consenso muda.\n\n"
+                "Isso não é previsão. É o registro histórico documentado."
             ),
             mecanismo(
-                f"**O que mudou nesse ciclo vs. anteriores:**\n\n"
-                f"ETFs spot aprovados = demanda institucional que não existia em 2020 ou 2022.\n\n"
-                f"Halving de 2024 = pressão de oferta estrutural.\n\n"
-                f"Adoção corporativa crescente = piso de suporte mais alto a cada ciclo.\n\n"
-                f"**O contexto macro muda o timing. Os fundamentos determinam a direção.**",
+                "**O que mudou nesse ciclo vs. 2020 e 2022:**\n\n"
+                + H_ETF + "\n\n"
+                "Halving de 2024: pressão de oferta estrutural que não existia antes.\n\n"
+                "**Contexto macro muda o timing. Fundamentos determinam a direção.**",
                 img="comparativo ciclos BTC"
             ),
             final(
-                f"Salva esse carrossel.\n\n"
-                f"Não pela análise.\n\n"
-                f"**Pelo registro de como você estava se sentindo agora.**\n\n"
-                f"Daqui a 4 anos, quando você olhar pra esse momento, vai querer ter feito algo com o medo.\n\n"
-                f"@criptobrasilofc"
+                "Salva esse carrossel.\n\nNão pela análise.\n\n"
+                "**Pelo registro de como você estava se sentindo agora.**\n\n"
+                "Daqui a 4 anos, quando você olhar pra esse momento, "
+                "vai querer ter feito algo com o medo.\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
-    # ── EDUCATIVO_CONTEXTO ────────────────────────────────────────────────────
     else:
+        num_ctx = f"O dado central: **{n1}**." if n1 else "O contexto que está faltando."
         return [
             capa(
                 f"O número que quase ninguém está contextualizando.\n\n**{title}**",
-                img="infográfico dark com dado central em destaque"
+                img="infográfico dark — dado central em destaque, amarelo"
             ),
             corpo(
-                f"**O contexto que está faltando:**\n\n{excerpt}\n\nFonte: {source}.",
+                f"**O contexto:**\n\n{num_ctx}\n\nFonte: {source}.\n\n"
+                "O número da manchete vs. o número que realmente importa.",
             ),
             corpo(
-                f"**O número da mídia vs. o número que importa:**\n\n"
-                f"{'Dado central: ' + num1 + chr(10) + chr(10) if num1 else ''}"
-                f"A mídia usa o número que chama atenção. "
-                f"O analista usa o número que explica o que está acontecendo.\n\n"
-                f"São quase sempre números diferentes.",
+                "**O mercado processa informações em camadas:**\n\n"
+                "**Camada 1:** manchete — reação emocional, rápida e exagerada.\n\n"
+                "**Camada 2:** dados on-chain — o que está acontecendo de verdade.\n\n"
+                "**Camada 3:** impacto real no preço — vem com atraso de dias ou semanas.\n\n"
+                "A maioria reage na camada 1."
             ),
             corpo(
-                f"**O mecanismo por trás do evento:**\n\n"
-                f"Eventos como esse se movem em camadas:\n\n"
-                f"Primeira camada: o que aparece na manchete.\n"
-                f"Segunda camada: o que os dados on-chain mostram.\n"
-                f"Terceira camada: o impacto real no preço — que vem com atraso de dias ou semanas.\n\n"
-                f"A maioria das pessoas reage na primeira camada.",
+                "**O contexto atual:**\n\n" + H_ETF,
             ),
             aviso(
-                f"Entender o contexto não significa que você sabe o que vai acontecer.\n\n"
-                f"Significa que você vai errar menos por impulso e mais por decisão consciente.\n\n"
-                f"Isso já é uma vantagem enorme frente a quem age só pela manchete."
+                "Entender o contexto não significa que você sabe o que vai acontecer.\n\n"
+                "Significa que você vai errar menos por impulso e mais por decisão consciente.\n\n"
+                "Isso já é uma vantagem enorme frente a quem age só pela manchete."
             ),
             mecanismo(
-                f"**O que fazer com essa informação:**\n\n"
-                f"Não agir com pressa. Verificar os dados na fonte.\n\n"
-                f"Perguntar: os fundamentos de longo prazo mudaram?\n\n"
-                f"Se a resposta for não — o que você está vendo é ruído.\n\n"
-                f"**Ruído com oportunidade embutida.**",
+                "**Quando narrativa e fundamentos divergem, os fundamentos sempre vencem — com atraso.**\n\n"
+                "É nessa defasagem que estão as oportunidades documentadas.\n\n"
+                "**Ruído de curto prazo. Sinal de longo prazo.**",
             ),
             final(
-                f"Salva esse carrossel.\n\n"
-                f"**2 minutos lendo isso vai mudar como você lê as próximas 100 notícias de cripto.**\n\n"
-                f"@criptobrasilofc"
+                "Salva esse carrossel.\n\n"
+                "**2 minutos lendo isso vai mudar como você lê "
+                "as próximas 100 notícias de cripto.**\n\n"
+                "@criptobrasilofc"
             ),
         ]
 
